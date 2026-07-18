@@ -3,290 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notarized Transaction - Verified</title>
+    <title>✅ Notarized Transaction</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.12.0/dist/ethers.umd.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f1f5f9; 
-            padding: 2rem; 
-            color: #0f172a;
-        }
-        .container { max-width: 1100px; margin: 0 auto; }
-        .header {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: white;
-            padding: 2rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .header p { color: #94a3b8; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-        .card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-            margin-bottom: 1.5rem;
-        }
-        .card h3 {
-            font-size: 1.2rem;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-            color: #0f172a;
-        }
-        .key { font-weight: 600; color: #475569; }
-        .value { 
-            font-family: 'Courier New', monospace; 
-            background: #f8fafc; 
-            padding: 0.2rem 0.4rem; 
-            border-radius: 4px;
-            word-break: break-all;
-        }
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .badge-success { background: #10b981; color: white; }
-        .hash-box {
-            background: #0f172a;
-            color: #e2e8f0;
-            padding: 1rem;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            word-break: break-all;
-            font-size: 0.9rem;
-        }
-        .verification-status {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            font-weight: 600;
-        }
-        .valid { background: #ecfdf5; border-left: 6px solid #10b981; color: #065f46; }
-        .invalid { background: #fef2f2; border-left: 6px solid #ef4444; color: #991b1b; }
-        .footer { margin-top: 2rem; text-align: center; color: #94a3b8; font-size: 0.8rem; }
+        body { font-family: Arial, sans-serif; background: #f1f5f9; padding: 2rem; }
+        .box { max-width: 900px; margin: auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #0f172a; }
+        .hash { background: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 8px; word-break: break-all; }
+        .valid { background: #d1fae5; border-left: 6px solid #10b981; padding: 1rem; border-radius: 6px; }
+        .invalid { background: #fee2e2; border-left: 6px solid #ef4444; padding: 1rem; border-radius: 6px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+        .key { font-weight: bold; color: #475569; }
     </style>
 </head>
 <body>
-<div class="container" id="app">
-    <div class="header">
-        <h1>📜 Notarized Transaction Proof</h1>
-        <p>Signed & Verified via Ethereum ECDSA | SHA-256 Hash</p>
-    </div>
-
-    <div id="content"></div>
-    <div class="footer">This document is cryptographically bound to its hash. Any change invalidates the signature.</div>
+<div class="box">
+    <h1>📜 Notarized Transaction Proof</h1>
+    <div id="content">⏳ Loading...</div>
 </div>
-
 <script>
-    (function() {
-        // --------------------------------------------------------
-        // 1. البيانات الكاملة (المعاملات، المحافظ، السويفت، التقنية)
-        // --------------------------------------------------------
-        const rawData = {
-            "audit": {
-                "metadata": {
-                    "start_time": "2026-06-05T18:12:00.980420+00:00",
-                    "endpoint": "https://eth-mainnet.g.alchemy.com/v2/d7j1QruPithGA78YTOZjl",
-                    "master_wallet": "0xFB941E800617DBE10d56fC9f425fc744b9892297",
-                    "api_key": "token_pDBN...",
-                    "audit_parameters": {
-                        "amount_eur": 1000000000.0,
-                        "converted_to": "USDT",
-                        "reference": "WILER-21-8414-BUCH-AM-IRCHEL"
-                    }
-                },
-                "steps": [
-                    { "step": 1, "name": "Initialize Environment", "status": "Success" },
-                    { "step": 2, "name": "Generate Certificate", "status": "Success" },
-                    { "step": 3, "name": "Build Metadata Payload", "status": "Success" },
-                    { "step": 4, "name": "Sign Payload", "status": "Success" },
-                    { "step": 5, "name": "Prepare Transmission", "status": "Success" },
-                    { "step": 6, "name": "Validate Payload", "status": "Success" },
-                    { "step": 7, "name": "Send Metadata Payload", "status": "Success" }
-                ],
-                "response": {
-                    "status": "success",
-                    "transaction_id": "tx_1780683217_fd588aad",
-                    "audit_ref": "WILER-21-8414-BUCH-AM-IRCHEL",
-                    "received_at": "2026-06-05T18:13:37.928021+00:00"
-                },
-                "audit_summary": {
-                    "duration_seconds": 96.95,
-                    "amount_eur": 1000000000.0,
-                    "status": "Success"
-                }
+    // -------------------- البيانات الخام --------------------
+    const DATA = {
+        "audit": {
+            "metadata": {
+                "start_time": "2026-06-05T18:12:00.980420+00:00",
+                "endpoint": "https://eth-mainnet.g.alchemy.com/v2/d7j1QruPithGA78YTOZjl",
+                "master_wallet": "0xFB941E800617DBE10d56fC9f425fc744b9892297"
             },
-            "wallet_info": {
-                "default_wallet": "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff",
-                "master_wallet": "0x5a52E96BAcdaBb82fd05763E25335261B270Efcb",
-                "chain_id": 1,
-                "network": "Ethereum Mainnet",
-                "smart_contracts": {
-                    "WETH": { "address": "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff", "decimals": 18 },
-                    "USDT": { "address": "0xdac17f958d2ee523a2206206994597c13d831ec7", "decimals": 6 }
-                }
+            "response": {
+                "transaction_id": "tx_1780683217_fd588aad",
+                "audit_ref": "WILER-21-8414-BUCH-AM-IRCHEL"
             },
-            "financial_swift": {
-                "beneficiary_company": "Lebenswerk Bau und Boden Brensbach GmbH",
-                "business_address": "Ludwigsplatz 1, 67059 Ludwigshafen am Rhein",
-                "legal_representative": "Alexander Richter (CEO)",
-                "total_amount_eur": "4,154,000,000.00",
-                "bank_account_id": "DEUT09388040213595",
-                "sender_bic": "DEUTDEDB545",
-                "bank_name": "Deutsche Bank AG",
-                "bank_email": "deutsche-bankg@db.com",
-                "swift_reference": "20260612MT10365491003919291",
-                "transaction_date": "2026-06-12",
-                "exchange_rate_eur_to_usdt": 1.09
-            },
-            "technical_infrastructure": {
-                "uat_url": "https://alpha-api2.db.com/olb/financial-data-exchange-toolbox/v3",
-                "production_url": "https://api2.db.com/olb/financial-data-exchange-toolbox/v3",
-                "ethereum_node": {
-                    "ip": "162.254.35.81",
-                    "location": "Frankfurt, Germany",
-                    "client": "Geth/v1.10.3"
-                },
-                "related_ips": ["174.138.90.64", "5.181.156.60"],
-                "authentication": {
-                    "auth_code": "AUTH-DEUT-2440-0725523445",
-                    "access_token": "2bfbd1f0cdb5d4c67a75c8c70b6d90ba",
-                    "verification_hash": "FF65D978A10E0A51"
-                },
-                "security_algorithms": {
-                    "encryption": "RSA-2048",
-                    "signature": "ECDSA",
-                    "hash": "SHA-256"
-                }
+            "audit_summary": {
+                "amount_eur": 1000000000.0,
+                "status": "Success"
             }
-        };
+        },
+        "wallet_info": {
+            "default_wallet": "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff",
+            "master_wallet": "0x5a52E96BAcdaBb82fd05763E25335261B270Efcb",
+            "network": "Ethereum Mainnet",
+            "smart_contracts": {
+                "USDT": { "address": "0xdac17f958d2ee523a2206206994597c13d831ec7" }
+            }
+        },
+        "financial_swift": {
+            "beneficiary_company": "Lebenswerk Bau und Boden Brensbach GmbH",
+            "business_address": "Ludwigsplatz 1, 67059 Ludwigshafen am Rhein",
+            "total_amount_eur": "4,154,000,000.00",
+            "swift_reference": "20260612MT10365491003919291",
+            "sender_bic": "DEUTDEDB545"
+        },
+        "technical_infrastructure": {
+            "uat_url": "https://alpha-api2.db.com/olb/financial-data-exchange-toolbox/v3",
+            "production_url": "https://api2.db.com/olb/financial-data-exchange-toolbox/v3",
+            "ethereum_node": { "ip": "162.254.35.81", "location": "Frankfurt, Germany" }
+        }
+    };
 
-        // التوقيع الموجود من ملف PDF (سنضعه هنا)
-        // هذا التوقيع صحيح بالنسبة لهذه البيانات وسيظهر كـ "VALID"
-        const SIGNATURE = "0xw187RVPPI4NeISq/UVL/D90pKEqyLydUFraz8pxM/M=";
-        const SIGNER_ADDRESS = "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff";
+    // التوقيع الموجود من الـ PDF
+    const SIGNATURE = "0xw187RVPPI4NeISq/UVL/D90pKEqyLydUFraz8pxM/M=";
+    const SIGNER = "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff";
 
-        // --------------------------------------------------------
-        // 2. حساب الهاش (SHA-256) في المتصفح
-        // --------------------------------------------------------
-        async function calculateHash(data) {
-            const jsonString = JSON.stringify(data, (key, value) => {
-                // نستثني حقل التحقق (إن وجد) حتى لا يؤثر على الهاش
-                return key === 'verification' ? undefined : value;
-            });
+    // -------------------- حساب الهاش والعرض --------------------
+    (async function() {
+        try {
+            // تحويل البيانات إلى نص (بدون إضافات)
+            const jsonStr = JSON.stringify(DATA);
+            
+            // حساب SHA-256
             const encoder = new TextEncoder();
-            const dataBuffer = encoder.encode(jsonString);
+            const dataBuffer = encoder.encode(jsonStr);
             const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+            const hashHex = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-        // --------------------------------------------------------
-        // 3. عرض البيانات والتحقق
-        // --------------------------------------------------------
-        async function render() {
-            const hash = await calculateHash(rawData);
-            const container = document.getElementById('content');
-
-            // التحقق من التوقيع باستخدام ethers.js
+            // التحقق من التوقيع
             let isValid = false;
-            let checkMsg = '⚠️ Unable to verify';
-            let classStatus = 'invalid';
-
+            let statusText = '⚠️ Unable to verify';
+            let statusClass = 'invalid';
             try {
-                // نحذف حقول التحقق من الرسالة لتطابق التوقيع
-                const msg = JSON.stringify(rawData, (key, value) => {
-                    return key === 'verification' ? undefined : value;
-                });
-                // نحتاج لتنسيق ثابت (بدون مسافات) مثل الذي تم التوقيع عليه
-                const msgStripped = JSON.stringify(rawData, (key, value) => {
-                    return key === 'verification' ? undefined : value;
-                }, 0);
-                
-                const recovered = ethers.verifyMessage(msgStripped, SIGNATURE);
-                if (recovered.toLowerCase() === SIGNER_ADDRESS.toLowerCase()) {
+                const recovered = ethers.verifyMessage(jsonStr, SIGNATURE);
+                if (recovered.toLowerCase() === SIGNER.toLowerCase()) {
                     isValid = true;
-                    checkMsg = '✅ Signature VALID (Matched)';
-                    classStatus = 'valid';
+                    statusText = '✅ Signature VALID (Matched)';
+                    statusClass = 'valid';
                 } else {
-                    checkMsg = '❌ Signature INVALID (Address mismatch)';
-                    classStatus = 'invalid';
+                    statusText = '❌ Signature INVALID (Address mismatch)';
+                    statusClass = 'invalid';
                 }
             } catch (e) {
-                checkMsg = '❌ Signature INVALID (Error: ' + e.message + ')';
-                classStatus = 'invalid';
+                statusText = '❌ Signature INVALID (Error)';
+                statusClass = 'invalid';
             }
 
-            // بناء واجهة العرض
-            let html = `
-                <div class="grid-2">
-                    <div class="card">
-                        <h3>🏦 Financial & SWIFT</h3>
-                        <p><span class="key">Company:</span> ${rawData.financial_swift.beneficiary_company}</p>
-                        <p><span class="key">Address:</span> ${rawData.financial_swift.business_address}</p>
-                        <p><span class="key">Total Amount:</span> <strong>${rawData.financial_swift.total_amount_eur} EUR</strong></p>
-                        <p><span class="key">SWIFT Ref:</span> ${rawData.financial_swift.swift_reference}</p>
-                        <p><span class="key">BIC:</span> ${rawData.financial_swift.sender_bic}</p>
-                        <p><span class="key">Date:</span> ${rawData.financial_swift.transaction_date}</p>
+            // عرض النتيجة
+            document.getElementById('content').innerHTML = `
+                <div class="grid">
+                    <div>
+                        <p><span class="key">Company:</span> ${DATA.financial_swift.beneficiary_company}</p>
+                        <p><span class="key">Amount:</span> ${DATA.financial_swift.total_amount_eur} EUR</p>
+                        <p><span class="key">SWIFT Ref:</span> ${DATA.financial_swift.swift_reference}</p>
+                        <p><span class="key">BIC:</span> ${DATA.financial_swift.sender_bic}</p>
                     </div>
-                    <div class="card">
-                        <h3>⛓️ Blockchain & Wallets</h3>
-                        <p><span class="key">Network:</span> ${rawData.wallet_info.network} (Chain ID: ${rawData.wallet_info.chain_id})</p>
-                        <p><span class="key">Default Wallet:</span> <span class="value">${rawData.wallet_info.default_wallet}</span></p>
-                        <p><span class="key">Master Wallet:</span> <span class="value">${rawData.wallet_info.master_wallet}</span></p>
-                        <p><span class="key">USDT:</span> <span class="value">${rawData.wallet_info.smart_contracts.USDT.address}</span></p>
+                    <div>
+                        <p><span class="key">Network:</span> ${DATA.wallet_info.network}</p>
+                        <p><span class="key">Master Wallet:</span> <code>${DATA.wallet_info.master_wallet}</code></p>
+                        <p><span class="key">Default Wallet:</span> <code>${DATA.wallet_info.default_wallet}</code></p>
+                        <p><span class="key">USDT Contract:</span> <code>${DATA.wallet_info.smart_contracts.USDT.address}</code></p>
                     </div>
                 </div>
-
-                <div class="card">
-                    <h3>📋 Audit Summary</h3>
-                    <p><span class="key">Reference:</span> ${rawData.audit.response.audit_ref}</p>
-                    <p><span class="key">Transaction ID:</span> ${rawData.audit.response.transaction_id}</p>
-                    <p><span class="key">Amount:</span> ${rawData.audit.audit_summary.amount_eur} EUR (Converted to USDT)</p>
-                    <p><span class="key">Duration:</span> ${rawData.audit.audit_summary.duration_seconds} seconds</p>
-                    <p><span class="key">Status:</span> <span class="badge badge-success">${rawData.audit.audit_summary.status}</span></p>
+                <hr>
+                <p><span class="key">Audit Reference:</span> ${DATA.audit.response.audit_ref}</p>
+                <p><span class="key">Transaction ID:</span> ${DATA.audit.response.transaction_id}</p>
+                <p><span class="key">Status:</span> ✅ ${DATA.audit.audit_summary.status}</p>
+                <div class="${statusClass}">
+                    <strong>${statusText}</strong>
+                    <p><span class="key">Signed By:</span> <code>${SIGNER}</code></p>
                 </div>
-
-                <div class="card">
-                    <h3>🖥️ Technical Infrastructure</h3>
-                    <p><span class="key">UAT:</span> ${rawData.technical_infrastructure.uat_url}</p>
-                    <p><span class="key">Production:</span> ${rawData.technical_infrastructure.production_url}</p>
-                    <p><span class="key">Node IP:</span> ${rawData.technical_infrastructure.ethereum_node.ip} (${rawData.technical_infrastructure.ethereum_node.location})</p>
-                    <p><span class="key">Security:</span> ${rawData.technical_infrastructure.security_algorithms.encryption} | ${rawData.technical_infrastructure.security_algorithms.signature} | ${rawData.technical_infrastructure.security_algorithms.hash}</p>
-                </div>
-
-                <div class="card">
-                    <h3>🔐 Cryptographic Verification</h3>
-                    <div class="verification-status ${classStatus}">
-                        <strong>${checkMsg}</strong>
-                        <p style="margin-top:0.5rem;"><span class="key">Signed By:</span> <span class="value">${SIGNER_ADDRESS}</span></p>
-                        <p><span class="key">Signature:</span> <span class="value" style="font-size:0.8rem;">${SIGNATURE}</span></p>
-                    </div>
-                    <div style="margin-top:1rem;">
-                        <p><strong>📌 SHA-256 Hash (Document Fingerprint):</strong></p>
-                        <div class="hash-box">${hash}</div>
-                        <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">
-                            This hash is uniquely generated from the document content. If any data changes, this hash changes, breaking the verification.
-                        </p>
-                    </div>
-                </div>
+                <p><span class="key">SHA-256 Hash (Document Fingerprint):</span></p>
+                <div class="hash">${hashHex}</div>
+                <p style="font-size:0.8rem; color:#64748b;">This hash is uniquely bound to the document content. Any change invalidates the signature.</p>
             `;
-
-            container.innerHTML = html;
+        } catch (err) {
+            document.getElementById('content').innerHTML = `<div class="invalid"><strong>❌ Error:</strong> ${err.message}</div>`;
         }
-
-        render();
     })();
 </script>
 </body>
