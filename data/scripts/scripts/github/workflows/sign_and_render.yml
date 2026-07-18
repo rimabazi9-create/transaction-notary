@@ -1,0 +1,39 @@
+name: Sign and Render Transaction
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'data/raw.json'
+  workflow_dispatch:  # يسمح بتشغيله يدوياً من واجهة GitHub
+
+jobs:
+  sign-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Run signer script
+      env:
+        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}  # المفتاح السري من GitHub
+      run: |
+        python scripts/signer.py
+        
+    - name: Commit and push signed file
+      run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "actions@github.com"
+        git add data/signed.json
+        git diff --staged --quiet || git commit -m "Auto-update signed.json"
+        git push
