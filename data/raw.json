@@ -1,0 +1,74 @@
+{
+  "audit": {
+    "metadata": {
+      "start_time": "2026-06-05T18:12:00.980420+00:00",
+      "endpoint": "https://eth-mainnet.g.alchemy.com/v2/d7j1QruPithGA78YTOZjl",
+      "master_wallet": "0xFB941E800617DBE10d56fC9f425fc744b9892297",
+      "api_key": "token_pDBN...",
+      "audit_parameters": {
+        "amount_eur": 1000000000.0,
+        "converted_to": "USDT",
+        "reference": "WILER-21-8414-BUCH-AM-IRCHEL"
+      }
+    },
+    "steps": [
+      { "step": 1, "name": "Initialize Environment", "status": "Success" },
+      { "step": 2, "name": "Generate Certificate", "status": "Success" },
+      { "step": 3, "name": "Build Metadata Payload", "status": "Success" },
+      { "step": 4, "name": "Sign Payload", "status": "Success" },
+      { "step": 5, "name": "Prepare Transmission", "status": "Success" },
+      { "step": 6, "name": "Validate Payload", "status": "Success" },
+      { "step": 7, "name": "Send Metadata Payload", "status": "Success" }
+    ],
+    "response": {
+      "status": "success",
+      "transaction_id": "tx_1780683217_fd588aad",
+      "audit_ref": "WILER-21-8414-BUCH-AM-IRCHEL",
+      "received_at": "2026-06-05T18:13:37.928021+00:00"
+    },
+    "audit_summary": {
+      "duration_seconds": 96.95,
+      "amount_eur": 1000000000.0,
+      "status": "Success"
+    }
+  },
+  "wallet_info": {
+    "default_wallet": "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff",
+    "master_wallet": "0x5a52E96BAcdaBb82fd05763E25335261B270Efcb",
+    "chain_id": 1,
+    "network": "Ethereum Mainnet",
+    "smart_contracts": {
+      "WETH": { "address": "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff", "decimals": 18 },
+      "USDT": { "address": "0xdac17f958d2ee523a2206206994597c13d831ec7", "decimals": 6 }
+    }
+  },
+  "financial_swift": {
+    "beneficiary_company": "Lebenswerk Bau und Boden Brensbach GmbH",
+    "business_address": "Ludwigsplatz 1, 67059 Ludwigshafen am Rhein",
+    "legal_representative": "Alexander Richter (CEO)",
+    "total_amount_eur": "4154000000.00",
+    "bank_account_id": "DEUT09388040213595",
+    "sender_bic": "DEUTDEDB545",
+    "bank_name": "Deutsche Bank AG",
+    "bank_email": "deutsche-bankg@db.com",
+    "swift_reference": "20260612MT10365491003919291",
+    "transaction_date": "2026-06-12",
+    "exchange_rate_eur_to_usdt": 1.09
+  },
+  "technical_infrastructure": {
+    "uat_url": "https://alpha-api2.db.com/olb/financial-data-exchange-toolbox/v3",
+    "production_url": "https://api2.db.com/olb/financial-data-exchange-toolbox/v3",
+    "ethereum_node": { "ip": "162.254.35.81", "location": "Frankfurt, Germany", "client": "Geth/v1.10.3" },
+    "related_ips": ["174.138.90.64", "5.181.156.60"],
+    "authentication": {
+      "auth_code": "AUTH-DEUT-2440-0725523445",
+      "access_token": "2bfbd1f0cdb5d4c67a75c8c70b6d90ba",
+      "verification_hash": "FF65D978A10E0A51"
+    },
+    "security_algorithms": {
+      "encryption": "RSA-2048",
+      "signature": "ECDSA",
+      "hash": "SHA-256"
+    }
+  }
+}
