@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verified Transaction Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.12.0/dist/ethers.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: #f0f4f8; 
+            padding: 2rem; 
+            color: #1e293b;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .badge-success { background: #10b981; color: white; }
+        .badge-warning { background: #f59e0b; color: #1e293b; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .card h2 { 
+            font-size: 1.25rem; 
+            font-weight: 600; 
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+            color: #0f172a;
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        .key { font-weight: 600; color: #475569; }
+        .value { font-family: 'Courier New', monospace; word-break: break-all; background: #f8fafc; padding: 0.25rem 0.5rem; border-radius: 4px; }
+        .verification-box {
+            background: #f1f5f9;
+            border-left: 6px solid #3b82f6;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .status-valid { border-left-color: #10b981; background: #ecfdf5; }
+        .status-invalid { border-left-color: #ef4444; background: #fef2f2; }
+        .hash-display { 
+            font-family: 'Courier New', monospace; 
+            background: #0f172a; 
+            color: #e2e8f0; 
+            padding: 0.75rem; 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+            word-break: break-all;
+        }
+        .footer { margin-top: 3rem; text-align: center; color: #94a3b8; font-size: 0.875rem; }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="header">
+            <h1>📜 Notarized Transaction Proof</h1>
+            <p>Blockchain-signed document with SHA-256 & ECDSA verification</p>
+        </div>
+
+        <div id="loading">⏳ Loading document...</div>
+        <div id="content" style="display: none;"></div>
+
+        <div class="footer">
+            <p>Verified using Ethereum ECDSA | Data sourced from <code>data/signed.json</code></p>
+        </div>
+    </div>
+
+    <script>
+        (async function() {
+            try {
+                const res = await fetch('data/signed.json');
+                if (!res.ok) throw new Error('File not found. Run GitHub Action first.');
+                const data = await res.json();
+                const container = document.getElementById('content');
+                container.style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+
+                // التحقق من التوقيع
+                let verificationStatus = '⚠️ Unable to verify';
+                let statusClass = 'verification-box';
+                if (data.verification && data.verification.signature && data.verification.signed_by) {
+                    try {
+                        const provider = new ethers.JsonRpcProvider('https://eth-mainnet.g.alchemy.com/v2/d7j1QruPithGA78YTOZjl');
+                        const signerAddress = data.verification.signed_by;
+                        const message = JSON.stringify(data, (key, value) => {
+                            if (key === 'verification') return undefined;
+                            return value;
+                        }, 0); // إزالة التوقيع من الرسالة الأصلية
+                        
+                        // نستخدم مكتبة ethers للتحقق
+                        const recoveredAddr = ethers.verifyMessage(message, data.verification.signature);
+                        if (recoveredAddr.toLowerCase() === signerAddress.toLowerCase()) {
+                            verificationStatus = '✅ Signature VALID';
+                            statusClass += ' status-valid';
+                        } else {
+                            verificationStatus = '❌ Signature INVALID (Address mismatch)';
+                            statusClass += ' status-invalid';
+                        }
+                    } catch (e) {
+                        verificationStatus = '❌ Signature INVALID (Error: ' + e.message + ')';
+                        statusClass += ' status-invalid';
+                    }
+                }
+
+                // بناء واجهة عرض جميلة
+                let html = `
+                    <div class="grid-2">
+                        <div class="card">
+                            <h2>🏦 Financial Details</h2>
+                            <p><span class="key">Beneficiary:</span> ${data.financial_swift.beneficiary_company}</p>
+                            <p><span class="key">Address:</span> ${data.financial_swift.business_address}</p>
+                            <p><span class="key">Total Amount:</span> <strong>${data.financial_swift.total_amount_eur} EUR</strong></p>
+                            <p><span class="key">SWIFT Ref:</span> ${data.financial_swift.swift_reference}</p>
+                            <p><span class="key">BIC:</span> ${data.financial_swift.sender_bic}</p>
+                        </div>
+                        <div class="card">
+                            <h2>⛓️ Blockchain & Wallets</h2>
+                            <p><span class="key">Network:</span> ${data.wallet_info.network} (Chain ID: ${data.wallet_info.chain_id})</p>
+                            <p><span class="key">Default Wallet:</span> <code>${data.wallet_info.default_wallet}</code></p>
+                            <p><span class="key">Master Wallet:</span> <code>${data.wallet_info.master_wallet}</code></p>
+                            <p><span class="key">USDT Contract:</span> <code>${data.wallet_info.smart_contracts.USDT.address}</code></p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>📋 Audit Summary</h2>
+                        <p><span class="key">Audit Reference:</span> ${data.audit.response.audit_ref}</p>
+                        <p><span class="key">Transaction ID:</span> ${data.audit.response.transaction_id}</p>
+                        <p><span class="key">Amount:</span> ${data.audit.audit_summary.amount_eur} EUR (Converted to USDT)</p>
+                        <p><span class="key">Duration:</span> ${data.audit.audit_summary.duration_seconds} seconds</p>
+                        <p><span class="key">Status:</span> <span class="badge badge-success">${data.audit.audit_summary.status}</span></p>
+                    </div>
+
+                    <div class="card">
+                        <h2>🔐 Verification & Notarization</h2>
+                        <div class="${statusClass}">
+                            <p><strong>Status:</strong> ${verificationStatus}</p>
+                            <p><span class="key">Signed By:</span> <code>${data.verification.signed_by}</code></p>
+                            <p><span class="key">Signature:</span> <code style="word-break:break-all;font-size:0.8rem;">${data.verification.signature}</code></p>
+                        </div>
+                        <div style="margin-top:1rem;">
+                            <p><span class="key">SHA-256 Hash of Document:</span></p>
+                            <div class="hash-display">${data.verification.sha256_hash}</div>
+                            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">
+                                This hash is cryptographically bound to the content. Any change will break this verification.
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                // إضافة تفاصيل البنية التحتية
+                html += `
+                    <div class="card">
+                        <h2>🖥️ Technical Infrastructure</h2>
+                        <p><span class="key">UAT:</span> ${data.technical_infrastructure.uat_url}</p>
+                        <p><span class="key">Production:</span> ${data.technical_infrastructure.production_url}</p>
+                        <p><span class="key">Node IP:</span> ${data.technical_infrastructure.ethereum_node.ip} (${data.technical_infrastructure.ethereum_node.location})</p>
+                        <p><span class="key">Security:</span> ${data.technical_infrastructure.security_algorithms.encryption} | ${data.technical_infrastructure.security_algorithms.signature} | ${data.technical_infrastructure.security_algorithms.hash}</p>
+                    </div>
+                `;
+
+                container.innerHTML = html;
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `❌ Error: ${error.message}`;
+            }
+        })();
+    </script>
+</body>
+</html>
