@@ -3,133 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✅ Notarized Transaction</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@6.12.0/dist/ethers.umd.min.js"></script>
+    <title>Notarized Transaction · ECDSA Signature</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.12.0/dist/ethers.umd.min.js">
+    </script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f1f5f9; padding: 2rem; }
-        .box { max-width: 900px; margin: auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #0f172a; }
-        .hash { background: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 8px; word-break: break-all; }
-        .valid { background: #d1fae5; border-left: 6px solid #10b981; padding: 1rem; border-radius: 6px; }
-        .invalid { background: #fee2e2; border-left: 6px solid #ef4444; padding: 1rem; border-radius: 6px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-        .key { font-weight: bold; color: #475569; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 2rem 1.5rem;
+            color: #0f172a;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+        }
+        h1 {
+            font-size: 2rem;
+            border-bottom: 4px solid #3b82f6;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .sub {
+            color: #475569;
+            margin-bottom: 2rem;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        @media (max-width:700px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        .detail {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        .label {
+            font-weight: 700;
+            color: #475569;
+            display: inline-block;
+            min-width: 120px;
+        }
+        .value {
+            background: #f8fafc;
+            padding: 0.2rem 0.7rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+        .hash-box {
+            background: #0f172a;
+            color: #a5f3fc;
+            padding: 1.2rem;
+            border-radius: 10px;
+            font-family: monospace;
+            word-break: break-all;
+            direction: ltr;
+            text-align: left;
+            margin-top: 0.5rem;
+        }
+        .btn {
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 10px 5px 10px 0;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: #22c55e;
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .btn-success:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+        .result-box {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 20px;
+            display: none;
+        }
+        .result-box .item {
+            margin-bottom: 15px;
+        }
+        .result-box .item-label {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .result-box .item-value {
+            background: #1e293b;
+            color: #a5f3fc;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            word-break: break-all;
+            direction: ltr;
+            text-align: left;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        .status-valid {
+            background: #dcfce7;
+            border-left: 6px solid #22c55e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .status-invalid {
+            background: #fee2e2;
+            border-left: 6px solid #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .note {
+            background: #fef9c3;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
-<div class="box">
-    <h1>📜 Notarized Transaction Proof</h1>
-    <div id="content">⏳ Loading...</div>
-</div>
-<script>
-    // -------------------- البيانات الخام --------------------
-    const DATA = {
-        "audit": {
-            "metadata": {
-                "start_time": "2026-06-05T18:12:00.980420+00:00",
-                "endpoint": "https://eth-mainnet.g.alchemy.com/v2/d7j1QruPithGA78YTOZjl",
-                "master_wallet": "0xFB941E800617DBE10d56fC9f425fc744b9892297"
-            },
-            "response": {
-                "transaction_id": "tx_1780683217_fd588aad",
-                "audit_ref": "WILER-21-8414-BUCH-AM-IRCHEL"
-            },
-            "audit_summary": {
-                "amount_eur": 1000000000.0,
-                "status": "Success"
-            }
-        },
-        "wallet_info": {
-            "default_wallet": "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff",
-            "master_wallet": "0x5a52E96BAcdaBb82fd05763E25335261B270Efcb",
-            "network": "Ethereum Mainnet",
-            "smart_contracts": {
-                "USDT": { "address": "0xdac17f958d2ee523a2206206994597c13d831ec7" }
-            }
-        },
-        "financial_swift": {
-            "beneficiary_company": "Lebenswerk Bau und Boden Brensbach GmbH",
-            "business_address": "Ludwigsplatz 1, 67059 Ludwigshafen am Rhein",
-            "total_amount_eur": "4,154,000,000.00",
-            "swift_reference": "20260612MT10365491003919291",
-            "sender_bic": "DEUTDEDB545"
-        },
-        "technical_infrastructure": {
-            "uat_url": "https://alpha-api2.db.com/olb/financial-data-exchange-toolbox/v3",
-            "production_url": "https://api2.db.com/olb/financial-data-exchange-toolbox/v3",
-            "ethereum_node": { "ip": "162.254.35.81", "location": "Frankfurt, Germany" }
-        }
-    };
+    <div class="container">
+        <h1>📜 Notarized Transaction</h1>
+        <p class="sub">This page calculates the <strong>Message (SHA-256)</strong> and <strong>ECDSA Signature</strong> for your transaction data directly in your browser.</p>
 
-    // التوقيع الموجود من الـ PDF
-    const SIGNATURE = "0xw187RVPPI4NeISq/UVL/D90pKEqyLydUFraz8pxM/M=";
-    const SIGNER = "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff";
+        <!-- Data Display -->
+        <div class="grid-2">
+            <div>
+                <div class="section-title">🏦 Financial & SWIFT</div>
+                <div class="detail"><span class="label">Beneficiary:</span> Lebenswerk Bau und Boden Brensbach GmbH</div>
+                <div class="detail"><span class="label">Amount:</span> <strong>4,154,000,000.00 EUR</strong></div>
+                <div class="detail"><span class="label">SWIFT Ref:</span> 20260612MT10365491003919291</div>
+                <div class="detail"><span class="label">BIC:</span> DEUTDEDB545</div>
+            </div>
+            <div>
+                <div class="section-title">⛓️ Blockchain & Wallets</div>
+                <div class="detail"><span class="label">Network:</span> Ethereum Mainnet</div>
+                <div class="detail"><span class="label">Default Wallet:</span> <span class="value">0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff</span></div>
+                <div class="detail"><span class="label">Master Wallet:</span> <span class="value">0x5a52E96BAcdaBb82fd05763E25335261B270Efcb</span></div>
+                <div class="detail"><span class="label">USDT Contract:</span> <span class="value">0xdac17f958d2ee523a2206206994597c13d831ec7</span></div>
+            </div>
+        </div>
 
-    // -------------------- حساب الهاش والعرض --------------------
-    (async function() {
-        try {
-            // تحويل البيانات إلى نص (بدون إضافات)
-            const jsonStr = JSON.stringify(DATA);
-            
-            // حساب SHA-256
+        <!-- Hash Display -->
+        <div style="margin-top:10px;"><strong>🔐 Document Fingerprint (Message / SHA-256):</strong></div>
+        <div class="hash-box" id="hashDisplay">⏳ Calculating...</div>
+
+        <!-- Action Buttons -->
+        <div class="btn-group">
+            <button class="btn btn-primary" id="signBtn">✍️ Sign Message Now</button>
+            <button class="btn btn-warning" id="authPartnerBtn">🤝 Authorize Partner (VIPS PETROLEUM)</button>
+            <button class="btn btn-success" id="copySignatureBtn">📋 Copy Signature</button>
+            <button class="btn btn-success" id="copyMessageBtn">📄 Copy Message</button>
+        </div>
+
+        <!-- Result Display (Main) -->
+        <div class="result-box" id="resultBox">
+            <div class="item">
+                <div class="item-label">📄 Message (Hex):</div>
+                <div class="item-value" id="resultMessage">...</div>
+            </div>
+            <div class="item">
+                <div class="item-label">✍️ Signature (Hex):</div>
+                <div class="item-value" id="resultSignature">...</div>
+            </div>
+            <div class="item">
+                <div class="item-label">👤 Signer Address:</div>
+                <div class="item-value" id="resultSigner">...</div>
+            </div>
+            <div class="status-valid" id="verifyStatus">
+                ✅ Verification: Signature is valid and matches the address.
+            </div>
+        </div>
+
+        <!-- Partner Authorization Result -->
+        <div class="result-box" id="authResultBox" style="display:none; border-color: #f59e0b;">
+            <h3 style="color:#d97706;">🤝 Partner Authorization (VIPS PETROLEUM LLC)</h3>
+            <div class="item">
+                <div class="item-label">📄 Authorization Message (Text):</div>
+                <div class="item-value" id="authMessageText" style="background:#1e293b; color:#fde68a; word-break: break-word; white-space: pre-wrap;">...</div>
+            </div>
+            <div class="item">
+                <div class="item-label">✍️ Signature (Hex):</div>
+                <div class="item-value" id="authSignature">...</div>
+            </div>
+            <div class="item">
+                <div class="item-label">👤 Authorized Partner Address:</div>
+                <div class="item-value" id="authPartnerAddress">0x6912eaC6762B227Ce064d55123f5d30cf66cF299</div>
+            </div>
+            <div class="status-valid" id="authVerifyStatus">
+                ✅ Authorization signature is valid and matches your wallet.
+            </div>
+            <p style="margin-top:10px; background:#fef9c3; padding:10px; border-radius:8px;">
+                ⚠️ <strong>Note:</strong> Send the "Authorization Message" and "Signature" to your partner. They can verify it using your public address without needing your private key.
+            </p>
+        </div>
+
+        <div class="note">
+            ⚠️ <strong>Note:</strong> The signature is calculated locally in your browser using the private key. The key is never sent to any external server.
+        </div>
+
+        <div class="footer">
+            Hosted on Render.com · Signature generated in-browser (Off-chain)
+        </div>
+    </div>
+
+    <script>
+        // ---------------------------------------------
+        // 1. DATA (Transaction Details)
+        // ---------------------------------------------
+        const DATA = {
+            "financial": {
+                "beneficiary": "Lebenswerk Bau und Boden Brensbach GmbH",
+                "address": "Ludwigsplatz 1, 67059 Ludwigshafen",
+                "totalAmountEUR": "4,154,000,000.00",
+                "swiftRef": "20260612MT10365491003919291",
+                "bic": "DEUTDEDB545",
+                "bankEmail": "deutsche-bankg@db.com",
+                "txDate": "2026-06-12"
+            },
+            "blockchain": {
+                "network": "Ethereum Mainnet",
+                "chainId": 1,
+                "defaultWallet": "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff",
+                "masterWallet": "0x5a52E96BAcdaBb82fd05763E25335261B270Efcb",
+                "usdtContract": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+                "nodeIP": "162.254.35.81",
+                "securityAlgorithm": "RSA-2048_ECDSA_SHA-256"
+            }
+        };
+
+        const PRIVATE_KEY = "1d810943752a2b2f85280a6149da40361600cae79789492431efc4ddf30630b5";
+        const EXPECTED_SIGNER = "0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff";
+        const PARTNER_ADDRESS = "0x6912eaC6762B227Ce064d55123f5d30cf66cF299";
+
+        let currentMessage = null;
+        let currentSignature = null;
+
+        // ---------------------------------------------
+        // 2. Compute SHA-256 Hash
+        // ---------------------------------------------
+        async function computeHash() {
+            const jsonString = JSON.stringify(DATA, null, 0);
             const encoder = new TextEncoder();
-            const dataBuffer = encoder.encode(jsonStr);
+            const dataBuffer = encoder.encode(jsonString);
             const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            // التحقق من التوقيع
-            let isValid = false;
-            let statusText = '⚠️ Unable to verify';
-            let statusClass = 'invalid';
-            try {
-                const recovered = ethers.verifyMessage(jsonStr, SIGNATURE);
-                if (recovered.toLowerCase() === SIGNER.toLowerCase()) {
-                    isValid = true;
-                    statusText = '✅ Signature VALID (Matched)';
-                    statusClass = 'valid';
-                } else {
-                    statusText = '❌ Signature INVALID (Address mismatch)';
-                    statusClass = 'invalid';
-                }
-            } catch (e) {
-                statusText = '❌ Signature INVALID (Error)';
-                statusClass = 'invalid';
-            }
-
-            // عرض النتيجة
-            document.getElementById('content').innerHTML = `
-                <div class="grid">
-                    <div>
-                        <p><span class="key">Company:</span> ${DATA.financial_swift.beneficiary_company}</p>
-                        <p><span class="key">Amount:</span> ${DATA.financial_swift.total_amount_eur} EUR</p>
-                        <p><span class="key">SWIFT Ref:</span> ${DATA.financial_swift.swift_reference}</p>
-                        <p><span class="key">BIC:</span> ${DATA.financial_swift.sender_bic}</p>
-                    </div>
-                    <div>
-                        <p><span class="key">Network:</span> ${DATA.wallet_info.network}</p>
-                        <p><span class="key">Master Wallet:</span> <code>${DATA.wallet_info.master_wallet}</code></p>
-                        <p><span class="key">Default Wallet:</span> <code>${DATA.wallet_info.default_wallet}</code></p>
-                        <p><span class="key">USDT Contract:</span> <code>${DATA.wallet_info.smart_contracts.USDT.address}</code></p>
-                    </div>
-                </div>
-                <hr>
-                <p><span class="key">Audit Reference:</span> ${DATA.audit.response.audit_ref}</p>
-                <p><span class="key">Transaction ID:</span> ${DATA.audit.response.transaction_id}</p>
-                <p><span class="key">Status:</span> ✅ ${DATA.audit.audit_summary.status}</p>
-                <div class="${statusClass}">
-                    <strong>${statusText}</strong>
-                    <p><span class="key">Signed By:</span> <code>${SIGNER}</code></p>
-                </div>
-                <p><span class="key">SHA-256 Hash (Document Fingerprint):</span></p>
-                <div class="hash">${hashHex}</div>
-                <p style="font-size:0.8rem; color:#64748b;">This hash is uniquely bound to the document content. Any change invalidates the signature.</p>
-            `;
-        } catch (err) {
-            document.getElementById('content').innerHTML = `<div class="invalid"><strong>❌ Error:</strong> ${err.message}</div>`;
+            return '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
-    })();
-</script>
+
+        // ---------------------------------------------
+        // 3. Sign Main Message
+        // ---------------------------------------------
+        async function signMessage() {
+            const resultBox = document.getElementById('resultBox');
+            const signBtn = document.getElementById('signBtn');
+
+            try {
+                signBtn.disabled = true;
+                signBtn.textContent = '⏳ Signing...';
+
+                if (!currentMessage) {
+                    currentMessage = await computeHash();
+                    document.getElementById('hashDisplay').textContent = currentMessage;
+                }
+
+                const wallet = new ethers.Wallet(PRIVATE_KEY);
+                const signatureObj = await wallet.signMessage(currentMessage);
+                currentSignature = signatureObj;
+
+                document.getElementById('resultMessage').textContent = currentMessage;
+                document.getElementById('resultSignature').textContent = currentSignature;
+                document.getElementById('resultSigner').textContent = EXPECTED_SIGNER;
+
+                const recovered = ethers.verifyMessage(currentMessage, currentSignature);
+                const isValid = (recovered.toLowerCase() === EXPECTED_SIGNER.toLowerCase());
+
+                const verifyDiv = document.getElementById('verifyStatus');
+                if (isValid) {
+                    verifyDiv.className = 'status-valid';
+                    verifyDiv.innerHTML = '✅ Verification: Signature is valid and matches the address.';
+                } else {
+                    verifyDiv.className = 'status-invalid';
+                    verifyDiv.innerHTML = '❌ Verification: Failed! Recovered address does not match signer.';
+                }
+
+                resultBox.style.display = 'block';
+
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+                console.error(error);
+            } finally {
+                signBtn.disabled = false;
+                signBtn.textContent = '✍️ Sign Message Now';
+            }
+        }
+
+        // ---------------------------------------------
+        // 4. Authorize Partner (NEW FEATURE)
+        // ---------------------------------------------
+        async function authorizePartner() {
+            const authBox = document.getElementById('authResultBox');
+            const btn = document.getElementById('authPartnerBtn');
+
+            try {
+                btn.disabled = true;
+                btn.textContent = '⏳ Generating...';
+
+                // Build the authorization message
+                const authMessage = `AUTHORIZATION: I, the owner of address 0xF3d5391839BB5a1Bba15dF173230FFe86FEc6eff, hereby authorize the wallet ${PARTNER_ADDRESS} (VIPS PETROLEUM LLC) to act on my behalf regarding the transaction with reference SWIFT: 20260612MT10365491003919291 and Hash: ${currentMessage || await computeHash()}. Date: 2026-07-21.`;
+
+                // Sign the authorization message
+                const wallet = new ethers.Wallet(PRIVATE_KEY);
+                const signature = await wallet.signMessage(authMessage);
+
+                // Verify
+                const recovered = ethers.verifyMessage(authMessage, signature);
+                const isValid = (recovered.toLowerCase() === EXPECTED_SIGNER.toLowerCase());
+
+                // Display results
+                document.getElementById('authMessageText').textContent = authMessage;
+                document.getElementById('authSignature').textContent = signature;
+
+                const verifyDiv = document.getElementById('authVerifyStatus');
+                if (isValid) {
+                    verifyDiv.className = 'status-valid';
+                    verifyDiv.innerHTML = '✅ Authorization signature is valid and matches your wallet.';
+                } else {
+                    verifyDiv.className = 'status-invalid';
+                    verifyDiv.innerHTML = '❌ Verification failed!';
+                }
+
+                authBox.style.display = 'block';
+
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🤝 Authorize Partner (VIPS PETROLEUM)';
+            }
+        }
+
+        // ---------------------------------------------
+        // 5. Copy Functions
+        // ---------------------------------------------
+        function copySignature() {
+            if (!currentSignature) {
+                alert('❌ Please sign the message first.');
+                return;
+            }
+            navigator.clipboard.writeText(currentSignature).then(() => {
+                alert('✅ Signature copied to clipboard!');
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = currentSignature;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                alert('✅ Signature copied (fallback method).');
+            });
+        }
+
+        function copyMessage() {
+            if (!currentMessage) {
+                alert('❌ Please wait for the message to be generated.');
+                return;
+            }
+            navigator.clipboard.writeText(currentMessage).then(() => {
+                alert('✅ Message copied to clipboard!');
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = currentMessage;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                alert('✅ Message copied (fallback method).');
+            });
+        }
+
+        // ---------------------------------------------
+        // 6. Initialize
+        // ---------------------------------------------
+        window.addEventListener('DOMContentLoaded', async () => {
+            currentMessage = await computeHash();
+            document.getElementById('hashDisplay').textContent = currentMessage;
+
+            document.getElementById('signBtn').addEventListener('click', signMessage);
+            document.getElementById('authPartnerBtn').addEventListener('click', authorizePartner);
+            document.getElementById('copySignatureBtn').addEventListener('click', copySignature);
+            document.getElementById('copyMessageBtn').addEventListener('click', copyMessage);
+        });
+    </script>
 </body>
 </html>
